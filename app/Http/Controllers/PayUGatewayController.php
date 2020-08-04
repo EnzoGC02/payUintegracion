@@ -8,6 +8,8 @@ use App\Lib\PayUPayments;
 use App\Lib\SupportedLanguages;
 use App\Lib\Environment;
 use App\Lib\PayUReports;
+use GuzzleHttp\Client;
+
 class PayUGatewayController extends Controller
 {
 
@@ -232,4 +234,35 @@ class PayUGatewayController extends Controller
         // }
     }
 
+    public function getCheckOut()
+    {
+       // header('Access-Control-Allow-Origin:*');
+        $stack = \GuzzleHttp\HandlerStack::create();
+        $lastRequest = null;
+        // $stack->Push(\GuzzleHttp\Middleware::mapRequest(function (\Psr\Http\Message\RequestInterface $request) use (&$lastRequest) {
+        //     $lastRequest = $request;
+        //     return $request;
+        // }));
+        $reference = uniqid();
+        //$redirect;
+        $signature = md5('4Vj8eK4rloUd272L48hsrarnUA~508029~' . $reference . '~25000~ARS');
+        $client = new Client(['base_uri' => 'https://sandbox.checkout.payulatam.com/']);
+        $response = $client->request('POST', 'ppp-web-gateway-payu', [
+            'form_params' => [
+                'merchantId' => "508029",
+                'referenceCode' => $reference,
+                'description' => 'testing checkout',
+                'amount' => "25000",
+                'signature' => $signature,
+                'accountId' => "512322",
+                'currency' => "ARS",
+                'buyerFullName' => "Enzo Calderon",
+                "buyerEmail" => "enzogclcc2@gmail.com",
+                "test"=>"1"
+            ],
+            'on_stats' => function (\GuzzleHttp\TransferStats $stats){
+                    echo($stats->getHandlerStats()['redirect_url']);
+                }
+        ]);
+    }
 }

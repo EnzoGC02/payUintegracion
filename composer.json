@@ -6,8 +6,9 @@
     "type": "project",
     "require": {
         "php": "^7.2.5",
+        "guzzlehttp/guzzle": "7.0",
         "laravel/lumen-framework": "^7.0",
-        "openpayu/openpayu" : "2.2.*"
+        "openpayu/openpayu": "2.2.*"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9.1",

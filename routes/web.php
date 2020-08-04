@@ -8,3 +8,4 @@ $router->get('/pagos/tarjetacredito','PayUGatewayController@tarjetaDeCredito');
 $router->get('/pagos/efectivo','PayUGatewayController@efectivo');
 $router->get('/pagos/ordershow','PayUGatewayController@getOrden');
 $router->get('/pagos/methodsshow','PayUGatewayController@metodosDePago');
+$router->get('/pagos/checkout','PayUGatewayController@getCheckOut');
