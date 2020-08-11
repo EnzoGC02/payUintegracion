@@ -1,6 +1,6 @@
 <?php
-
 namespace App\Http\Controllers;
+// include "vendor/autoload.php";
 use App\Lib\PayU;
 use App\Lib\PayUParameters;
 use App\Lib\PayUCountries;
@@ -9,12 +9,15 @@ use App\Lib\SupportedLanguages;
 use App\Lib\Environment;
 use App\Lib\PayUReports;
 use GuzzleHttp\Client;
+use OpenPayU\OpenPayU_Configuration;
 
 class PayUGatewayController extends Controller
 {
 
     public function __construct()
     {
+      
+        // echo "chota"
         PayU::$apiKey = "4Vj8eK4rloUd272L48hsrarnUA"; //Ingrese aquí su propio apiKey.
         PayU::$apiLogin = "pRRXKOl8ikMmt9u"; //Ingrese aquí su propio apiLogin.
         PayU::$merchantId = "508029"; //Ingrese aquí su Id de Comercio.
@@ -24,7 +27,7 @@ class PayUGatewayController extends Controller
         Environment::setPaymentsCustomUrl("https://sandbox.api.payulatam.com/payments-api/4.0/service.cgi");
         Environment::setReportsCustomUrl("https://sandbox.api.payulatam.com/reports-api/4.0/service.cgi");
     }
-   // OpenPayU_Configuration::setEnvironment('sandbox');
+   
 
     public function tarjetaDeCredito(){
         //echo "negro re puto";
@@ -126,7 +129,7 @@ class PayUGatewayController extends Controller
     public function getOrden(){
         //orden test generada para  tarjeta de credito: "120291744"
         //orden test generada para  pago efectivo:"853418669"
-        $parameters = array(PayUParameters::ORDER_ID => "120291744");
+        $parameters = array(PayUParameters::ORDER_ID => "120336316");
         $order = PayUReports::getOrderDetail($parameters);
         if($order){
             var_dump($order);
@@ -236,15 +239,7 @@ class PayUGatewayController extends Controller
 
     public function getCheckOut()
     {
-       // header('Access-Control-Allow-Origin:*');
-        $stack = \GuzzleHttp\HandlerStack::create();
-        $lastRequest = null;
-        // $stack->Push(\GuzzleHttp\Middleware::mapRequest(function (\Psr\Http\Message\RequestInterface $request) use (&$lastRequest) {
-        //     $lastRequest = $request;
-        //     return $request;
-        // }));
         $reference = uniqid();
-        //$redirect;
         $signature = md5('4Vj8eK4rloUd272L48hsrarnUA~508029~' . $reference . '~25000~ARS');
         $client = new Client(['base_uri' => 'https://sandbox.checkout.payulatam.com/']);
         $response = $client->request('POST', 'ppp-web-gateway-payu', [
@@ -256,13 +251,32 @@ class PayUGatewayController extends Controller
                 'signature' => $signature,
                 'accountId' => "512322",
                 'currency' => "ARS",
-                'buyerFullName' => "Enzo Calderon",
-                "buyerEmail" => "enzogclcc2@gmail.com",
-                "test"=>"1"
+                // 'buyerFullName' => "Enzo Calderon",
+                // "buyerEmail" => "enzogclcc2@gmail.com",
+                "test"=>"1",
+                // 'responseUrl'=>"http://localhost/testPayu/public/pagos/response"
+                "confirmationUrl"=>"https://sedacreditaciones.com/apis/inventario/api/elements/testPayu"
             ],
             'on_stats' => function (\GuzzleHttp\TransferStats $stats){
                     echo($stats->getHandlerStats()['redirect_url']);
                 }
         ]);
+    }
+
+    public function response(){
+        $gestor = fopen("C:\Users\administrador\Desktop\data.txt", "r+");
+        $order_id=$_GET['transactionId'];
+        fwrite($gestor, $order_id);
+        fclose($gestor);
+        // $parameters = array(PayUParameters::TRANSACTION_ID => "960b1a5d-575d-4bd9-927e-0ffbf5dc4296");
+        // $response = PayUReports::getTransactionResponse($parameters);
+
+        // if ($response) {
+        //     $response->state;
+        //     $response->trazabilityCode;
+        //     $response->authorizationCode;
+        //     $response->responseCode;
+        //     $response->operationDate;
+        // }
     }
 }
